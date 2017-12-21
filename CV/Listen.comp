@@ -1,0 +1,34 @@
+Listen.comp <- function(dt, col=c(1:dim(dt)[2]), func.names=c("mean", "var")){
+  func.names <- tolower(func.names)
+  func.1 <- get(func.names[1])
+  func.2 <- get(func.names[2])
+  f1 <- summarise_all(dt[,col], funs(func.1(., na.rm=TRUE)))
+  f2 <- summarise_all(dt[,col], funs(func.2(., na.rm=TRUE)))
+  if(length(func.names)==2){
+    res <- data.frame(t(rbind(f1,f2)))
+    rm(f1,f2)
+    colnames(res) <- func.names[1:2]
+    options(scipen = 999)
+    return(res)
+  }
+  else if(length(func.names)==3){
+    func.3 <- get(func.names[3])
+    f3 <- summarise_all(dt[,col], funs(func.3(., na.rm=TRUE)))
+    res <- data.frame(t(rbind(f1,f2,f3)))
+    rm(f1,f2,f3)
+    colnames(res) <- func.names
+    options(scipen = 999)
+    return(res)
+  }
+  else{
+    func.3 <- get(func.names[3])
+    f3 <- summarise_all(dt[,col], funs(func.3(., na.rm=TRUE)))
+    func.4 <- get(func.names[4])
+    f4 <- summarise_all(dt[,col], funs(func.4(., na.rm=TRUE, constant=1)))
+    res <- data.frame(t(rbind(f1,f2,f3,f4)))
+    rm(f1,f2,f3,f4)
+    colnames(res) <- func.names
+    options(scipen = 999)
+    return(res)
+  }
+}
