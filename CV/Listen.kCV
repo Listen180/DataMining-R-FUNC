@@ -1,0 +1,22 @@
+Listen.kCV <- function(dt, k=dim(dt)[1], option="average", xrange=c(2:dim(dt)[2]), yrange=1){
+  chunk.id <- cut(c(1:dim(dt)[1]), k, labels=FALSE)
+  chunk.id.rand <- sample(chunk.id, length(chunk.id))
+  for(i in 1: k){
+    err.i <- Listen.do.chunk(i, chunk.id.rand, dt, xrange, yrange)
+    if(i==1){
+      err <- err.i
+    }
+    else{
+      err <- rbind(err, err.i)
+    }
+  }
+  if(option=="all"){
+    return(err)
+  }
+  else if(option=="average"){
+    err.mean <- data.frame(t(apply(err, 2, mean)))
+    err.mean$fold <- k
+    colnames(err.mean)[1] <- "fold.total"
+    return(err.mean)
+  }
+}
