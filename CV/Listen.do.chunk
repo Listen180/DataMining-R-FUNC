@@ -1,0 +1,30 @@
+# K.th-fold CV Function
+Listen.do.chunk <- function(chunk.id, chunk.id.rand, dt.fit, 
+                            xrange=c(2:dim(dt.fit)[2]), yrange=1){
+  
+  train = (chunk.id.rand != chunk.id)
+  
+  Xtr = dt.fit[train, xrange] # get training set
+  Ytr = dt.fit[train, yrange] # get true response values in trainig set
+  
+  Xvl = dt.fit[!train, xrange] # get validation set
+  Yvl = dt.fit[!train, yrange] # get true response values in validation set
+  
+  formula <- as.formula(paste(colnames(dt.fit)[1], "~ ."))
+  lm <- lm(formula, data = dt.fit[train,])
+  
+  if(dim(dt.fit)[2]==2){
+    predYtr = lm$coefficients[1] + lm$coefficients[2]*Xtr
+    predYvl = lm$coefficients[1] + lm$coefficients[2]*Xvl
+  }
+  else{
+    predYtr = predict(lm, Xtr) # predict training values
+    predYvl = predict(lm, Xvl) # predict validation values
+  }
+  
+  
+  err <- data.frame(fold = chunk.id,
+             train.error = mean((predYtr - Ytr)^2), # compute and store trainin 
+             val.error = mean((predYvl - Yvl)^2)) # compute and store test error
+  return(err)
+}
